@@ -239,7 +239,7 @@ def api_toggle_riders_gate_start():
 def auto_gate():
     while True:
         riders_gate.refresh_random_delay()
-        time.sleep(15)
+        time.sleep(30)
 
 import threading
 threading.Thread(target=auto_gate).start()
