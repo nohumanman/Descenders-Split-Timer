@@ -5,7 +5,7 @@ import time
 from PlayerDB import PlayerDB
 from Tokens import webhook, bot_token
 from RidersGate import RidersGate
-from Boundry import Boundry, Checkpoint
+from Boundry import Checkpoint
 
 
 app = Flask(__name__)
@@ -38,10 +38,8 @@ def on_boundry_enter(boundry_guid):
     trail_name = request.args.get("trail_name")
     client_time = request.args.get("client_time")
     logging.info(f'''Player {player.steam_name} (id {player.steam_id}) on {player.world} has entered boundry on trail "{trail_name}" with client time {client_time}''')
-    boundry = Boundry(float(client_time))
-    player.on_boundry_enter(boundry_guid, boundry)
     player.trail = trail_name
-    return "valid"
+    return player.on_boundry_enter(float(client_time))
 
 @app.route("/API/DESCENDERS/ON-BOUNDRY-EXIT/<boundry_guid>")
 def on_boundry_exit(boundry_guid):
@@ -49,9 +47,8 @@ def on_boundry_exit(boundry_guid):
     trail_name = request.args.get("trail_name")
     client_time = request.args.get("client_time")
     logging.info(f'''Player {player.steam_name} (id {player.steam_id}) on {player.world} has exited the boundry on trail "{trail_name}" with client time {client_time}''')
-    boundry = Boundry(float(client_time))
     player.trail = trail_name
-    return player.on_boundry_exit(boundry_guid, boundry)
+    return player.on_boundry_exit(float(client_time))
 
 @app.route("/API/DESCENDERS/ON-CHECKPOINT-ENTER/<checkpoint_num>")
 def on_checkpoint_enter(checkpoint_num):

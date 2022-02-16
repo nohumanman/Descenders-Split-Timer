@@ -1,7 +1,5 @@
 
-class Boundry():
-    def __init__(self, time_entered):
-        self.time_entered = time_entered
+from os import getuid
 
 class Checkpoint():
     def __init__(self, type : str, num : int, total_checkpoints: int):

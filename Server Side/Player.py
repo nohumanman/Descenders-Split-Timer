@@ -30,7 +30,8 @@ class Player():
             self.avatar_src = avatar_src
         except:
             self.avatar_src = ""
-        self.entered_boundaries = {}
+        self.times_entered = []
+        self.times_exited = []
         self.trail = "unknown"
         self.bike = "unknown"
         self.update_player_in_db()
@@ -52,22 +53,35 @@ class Player():
             self.online = False
         return "valid"
 
-    def on_boundry_enter(self, boundry_guid, boundry):
-        self.entered_boundaries[boundry_guid] = boundry
+    def on_boundry_enter(self, client_time : float):
+        self.times_entered.append(client_time)
+        return self.boundaries_are_valid()
 
-    def on_boundry_exit(self, boundry_guid, boundry):
-        try:
-            self.entered_boundaries.pop(boundry_guid)
-        except:
-            logging.warning("Boundry already popped!?")
-        logging.info("Waiting 0.3 secs...")
-        time.sleep(0.3)
-        logging.info("Waited!")
-        if len(self.entered_boundaries) == 0:
-            logging.info("Outside of boundry!")
-            return "Ouside of boundry for more than 300 milliseconds!"
-        else:
+    def on_boundry_exit(self, client_time : float):
+        self.times_exited.append(client_time)
+        return "valid"
+
+    def boundaries_are_valid(self):
+        boundries = []
+        self.times_entered.sort()
+        self.times_exited.sort()
+        for enter in self.times_entered:
+            boundries.append({"time" : enter, "type": "ENTER"})
+        for exit in self.times_exited:
+            boundries.append({"time" : exit, "type": "EXIT"})
+        boundries.sort(key=lambda x: x['time'])
+        amount_exits = 0
+        amount_enters = 0
+        for boundary in boundries:
+            if boundary['type'] == "EXIT":
+                amount_exits += 1
+            elif boundary['type'] == "ENTER":
+                amount_enters += 1
+        logging.info(amount_exits)
+        logging.info(amount_enters)
+        if amount_exits+2 <= amount_enters:
             return "valid"
+        return "OUT OF BOUNDS!"
 
     def on_checkpoint_enter(self, checkpoint, client_time):
         if checkpoint.type == "start":
