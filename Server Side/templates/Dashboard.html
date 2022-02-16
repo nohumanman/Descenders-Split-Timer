@@ -17,9 +17,9 @@
         <div id="app">
             <v-app style="font-family: MontHeavy; background-color: rgba(30,30,30,255);">
                 <v-main>
-                    <v-banner color="warning">
-                        <v-icon slot="icon" size="36" color="white">mdi-alert</v-icon>
-                        This site is in construction - some features may be unavailable.
+                    <v-banner v-if="server_status.icon != ''" :color="server_status.color">
+                        <v-icon slot="icon" size="36" color="white">[[server_status.icon]]</v-icon>
+                        [[server_status.text]]
                     </v-banner>
                     <v-tabs style="height: 100%;">
                         <v-tab>Players</v-tab>
@@ -162,6 +162,7 @@
                 ban_options: ["unbanned", "shadowban", "destroy_player", "quit_game", "crash_game"],
                 show_competitors_only : false,
                 debug: false,
+                server_status: {"icon": ""},
                 trail_headers : [
                     {text:"trail_name", value:"trail_name"},
                     {text:"total_checkpoints", value: "total_checkpoints"},
@@ -280,6 +281,11 @@
                     var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
                     var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
                     return hDisplay + mDisplay + sDisplay; 
+                },
+                updateServerStatus(){
+                    $.get("/static/server-status.json", function(data){
+                        app.server_status = data;
+                    })
                 }
             }
         }
@@ -293,6 +299,9 @@
         setInterval(function(){
             app.update_trails();
         }, 200);
+        setInterval(function(){
+            app.updateServerStatus();
+        }, 200)
     </script>
     <style>
         table {
