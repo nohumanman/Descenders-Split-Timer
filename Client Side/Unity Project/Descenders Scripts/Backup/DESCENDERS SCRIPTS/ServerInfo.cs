@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 using ModTool.Interface;
 
 public class ServerInfo : ModBehaviour {
-	public string server = "https://descenders-api.nohumanman.com:8443";
+	public string server = "https://split-timer.nohumanman.com/";
 	[System.NonSerialized]
 	public bool isOnline = true;
 	private static ServerInfo _instance;
